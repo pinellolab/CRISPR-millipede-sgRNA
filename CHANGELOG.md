@@ -2,6 +2,17 @@
 
 Entries here are not yet assigned a version — the user reviews accumulated changes and picks the next release number.
 
+## [0.2.2] - 2026-07-08
+
+### Performance
+
+- **`get_mutation_profile`** per-guide linked-mutation encoding is now **vectorized**. The previous inner loop built a `pd.Series` per position and did a `pd.concat` per observed allele to prepend the `SequenceType` level, then a final `pd.concat(..., axis=1).transpose()` over all alleles; this is replaced by `get_substitution_encoding_batch`, which encodes all of a guide's aligned alleles at once into a single `M×6L` DataFrame via numpy broadcasting. **Bit-identical** to the previous output (validated: 729/729 protospacer-tier and 711/711 protospacer+surrogate+barcode-tier guides `.equals` on a real sample; `batch == per-allele` over 400 synthetic trials including `N`/`-`/`X` reference bases) and roughly **38× faster** (one sample's protospacer-tier profile: ~510 s → ~13 s).
+
+### Added — backward-compatible keyword arguments (defaults reproduce previous behaviour)
+
+- `compute_unlinked: bool = True` — when `False`, skip building the per-allele *unlinked* mutation tables (`determine_mutations_in_sequence`); the returned object's `all_observed_*_unlinked_mutations_df` stay `None`. Useful when only the `linked_mutations_whitelist_reporter_dict` is consumed; the linked dict is unchanged.
+- `max_reads_per_guide: Optional[int] = None` / `max_alleles_per_guide: Optional[int] = None` — deterministic per-guide cap that keeps the most-abundant alleles first (cumulative reads ≥ N, or top-N alleles), to bound pathologically high-coverage guides. **Note:** the abundance cap biases per-variant (bystander-edit) frequencies — it is a bounded-work knob, not for frequency-sensitive use; leave unset (the default) for exact results.
+
 ## [0.2.1] - 2026-06-26
 
 ### Performance

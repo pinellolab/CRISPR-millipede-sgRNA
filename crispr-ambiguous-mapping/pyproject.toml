@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "crispr-ambiguous-mapping"
-version = "0.2.1"
+version = "0.2.2"
 description = "Hamming-distance-based CRISPR guide RNA mapping with IUPAC-ambiguous base-editor support."
 authors = ["Basheer Becerra <bbecerr@outlook.com>"]
 readme = "README.md"
